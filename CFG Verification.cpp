@@ -2,67 +2,67 @@
 
 struct NonTerminal
 {
-	int nrp;
-	char non_terminal, prod[20][200];
+	int production_number;
+	char non_terminal, productions[20][200];
 };
 
-struct Nod
+struct Node
 {
 	char str[200];
-	Nod* fiu[100];
+	Node* son[100];
 };
 
-int nrNT;
-bool ok;
+int NT_number;
+bool OK;
 NonTerminal NT[50];
 
-bool verificare(Nod* rad, char cuv[])
+bool check(Node* root, char checked_word[])
 {
-	if (strcmp(rad->str, cuv) == 0 || ok || (strlen(rad->str) == 0 && strcmp(cuv, ".") == 0))
+	if (strcmp(root->str, checked_word) == 0 || OK || (strlen(root->str) == 0 && strcmp(checked_word, ".") == 0))
 	{
-		ok = true;
+		OK = true;
 		return true;
 	}
 
-	int cnt = 0, cntNT = 0;
+	int count = 0, count_Non_Terminals = 0;
 
-	for (int i = 0; i < strlen(rad->str); i++)
-		if (rad->str[i] >= 'a' && rad->str[i] <= 'z')
-			cnt++;
+	for (int i = 0; i < strlen(root->str); i++)
+		if (root->str[i] >= 'a' && root->str[i] <= 'z')
+			count++;
 
-	for (int i = 0; i < strlen(rad->str); i++)
-		if (rad->str[i] >= 'A' && rad->str[i] <= 'Z')
-			cntNT++;
+	for (int i = 0; i < strlen(root->str); i++)
+		if (root->str[i] >= 'A' && root->str[i] <= 'Z')
+			count_Non_Terminals++;
 
-	if (cnt > strlen(cuv) || cntNT > 7)
+	if (count > strlen(checked_word) || count_Non_Terminals > 7)
 		return false;
 
-	for (int i = 0; i < strlen(rad->str) && !ok; i++)
-		if (rad->str[i] >= 'A' && rad->str[i] <= 'Z')
-			for (int j = 0; j < nrNT && !ok; j++)
-				if (NT[j].non_terminal == rad->str[i])
-					for (int z = 0; z < NT[j].nrp && !ok; z++)
+	for (int i = 0; i < strlen(root->str) && !OK; i++)
+		if (root->str[i] >= 'A' && root->str[i] <= 'Z')
+			for (int j = 0; j < NT_number && !OK; j++)
+				if (NT[j].non_terminal == root->str[i])
+					for (int z = 0; z < NT[j].production_number && !OK; z++)
 					{
-						rad->fiu[z] = new Nod;
+						root->son[z] = new Node;
 
-						strcpy(rad->fiu[z]->str, rad->str);
+						strcpy(root->son[z]->str, root->str);
 
 						char aux[200];
-						strcpy(aux, rad->fiu[z]->str + i + 1);
+						strcpy(aux, root->son[z]->str + i + 1);
 
-						if (NT[j].prod[z][0] == '.')
+						if (NT[j].productions[z][0] == '.')
 						{
-							strcpy(rad->fiu[z]->str + i, aux);
+							strcpy(root->son[z]->str + i, aux);
 						}
 						else
 						{
-							strcpy(rad->fiu[z]->str + i, NT[j].prod[z]);
-							strcpy(rad->fiu[z]->str + strlen(rad->fiu[z]->str), aux);
+							strcpy(root->son[z]->str + i, NT[j].productions[z]);
+							strcpy(root->son[z]->str + strlen(root->son[z]->str), aux);
 						}
-						verificare(rad->fiu[z], cuv);
+						check(root->son[z], checked_word);
 					}
 
-	if (ok)
+	if (OK)
 		return true;
 	return false;
 }
@@ -70,39 +70,39 @@ bool verificare(Nod* rad, char cuv[])
 int main()
 {
 	ifstream fin("gic.in");
-	char begNT;
+	char startPoint;
 
-	fin >> nrNT >> begNT;
+	fin >> NT_number >> startPoint;
 
-	for (int i = 0; i < nrNT; i++)
+	for (int i = 0; i < NT_number; i++)
 	{
-		fin >> NT[i].non_terminal >> NT[i].nrp;
+		fin >> NT[i].non_terminal >> NT[i].production_number;
 
-		for (int j = 0; j < NT[i].nrp; j++)
-			fin >> NT[i].prod[j];
+		for (int j = 0; j < NT[i].production_number; j++)
+			fin >> NT[i].productions[j];
 
 	}
-	Nod* rad = new Nod;
+	Node* ROOT = new Node;
 
-	rad->str[0] = begNT;
-	rad->str[1] = '\0';
+	ROOT->str[0] = startPoint;
+	ROOT->str[1] = '\0';
 
-	char cuv_verif[200], yn;
+	char checked_word[200], choice;
 	do
 	{
-		ok = false;
-		cout << "Cuvant de verificat: ";
-		cin >> cuv_verif;
+		OK = false;
+		cout << "Type the word you want to verify: ";
+		cin >> checked_word;
 
-		if (verificare(rad, cuv_verif))
-			cout << "Acceptat.";
+		if (check(ROOT, checked_word))
+			cout << "Word accepted.";
 		else
-			cout << "Neacceptat.";
+			cout << "Word denied.";
 
-		cout << "\n\nContinuati(y/n)? ";
-		cin >> yn;
+		cout << "\n\nDo you want to verify another word? (Y / N) ";
+		cin >> choice;
 		cout << endl;
-	} while (yn == 'y');
+	} while (choice == 'y' || choice == 'Y');
 
-  system("pause"); //return 0;
+	system("pause");
 }
